@@ -58,7 +58,7 @@ type RepositoryFile struct {
 	Data     []byte
 }
 
-// DownloadSelectedRepositoryFiles downloads files from a given repository and granch, given that their name matches regarding the `include` function
+// DownloadSelectedRepositoryFiles downloads files from a given repository and branch, given that their name matches regarding the `include` function
 func DownloadSelectedRepositoryFiles(c *http.Client, owner, repo, branch string, include Matcher) map[string]RepositoryFile {
 	u := fmt.Sprintf("https://api.github.com/repos/%s/%s/tarball/%s", owner, repo, branch)
 	core.Debugf("Downloading tarball for repo: %s", u)
