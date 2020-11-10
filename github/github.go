@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
 	"strings"
@@ -38,7 +39,15 @@ func NewClient() *github.Client {
 		)
 		httpClient = oauth2.NewClient(context.Background(), ts)
 	}
-	return github.NewClient(httpClient)
+	c := github.NewClient(httpClient)
+	u, err := url.Parse(APIURL())
+	if err == nil {
+		if !strings.HasSuffix(u.Path, "/") {
+			u.Path = u.Path + "/"
+		}
+		c.BaseURL = u
+	}
+	return c
 }
 
 var GitHub = NewClient()

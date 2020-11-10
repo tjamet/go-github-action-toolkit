@@ -103,25 +103,26 @@ func getIndex(a []string, i int) string {
 
 // ParseActionEnv parses the environemnt and extracts the ActionContext on demand. For example in tests
 func ParseActionEnv() ActionContext {
-	r := strings.SplitN(os.Getenv("GITHUB_REPOSITORY"), "/", 2)
+	r := strings.SplitN(Repository(), "/", 2)
 	repo := ActionRepo{
 		Owner: getIndex(r, 0),
 		Repo:  getIndex(r, 1),
 	}
 	ctx := ActionContext{
-		EventName: os.Getenv("GITHUB_EVENT_NAME"),
-		SHA:       os.Getenv("GITHUB_SHA"),
-		Ref:       os.Getenv("GITHUB_REF"),
-		Workflow:  os.Getenv("GITHUB_WORKFLOW"),
-		Action:    os.Getenv("GITHUB_ACTION"),
-		Actor:     os.Getenv("GITHUB_ACTOR"),
+		// https://docs.github.com/en/free-pro-team@latest/actions/reference/environment-variables#default-environment-variables
+		EventName: EventName(),
+		SHA:       SHA(),
+		Ref:       Ref(),
+		Workflow:  Workflow(),
+		Action:    Action(),
+		Actor:     Actor(),
 		Repo:      repo,
 		Issue: ActionIssue{
 			Owner: repo.Owner,
 			Repo:  repo.Repo,
 		},
 	}
-	eventPath := os.Getenv("GITHUB_EVENT_PATH")
+	eventPath := EventPath()
 	if _, err := os.Stat(eventPath); err == nil && eventPath != "" {
 		fd, err := os.Open(eventPath)
 		if err != nil {
