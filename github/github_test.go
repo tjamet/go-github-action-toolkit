@@ -2,6 +2,7 @@ package github_test
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -34,4 +35,16 @@ func TestMatchOneOf(t *testing.T) {
 	assert.False(t, github.MatchesOneOf("\\.github/settings\\..*")(".github/settings/branches/master/protection.json"))
 	assert.True(t, github.MatchesOneOf("\\.github/settings\\..*", ".github/settings/.*")(".github/settings/branches/master/protection.json"))
 	assert.False(t, github.MatchesOneOf("\\.github/some-other.*")(".github/settings/branches/master/protection.json"))
+}
+
+func TestDownloadArtifact(t *testing.T) {
+	if !github.Actions() {
+		t.Skip("Not running in a github action, will not be able to download the artifact. Skipping")
+		return
+	}
+	github.GitHub = github.NewClient()
+	art, err := github.DownloadArtifact("test")
+	// assert.NoError(t, err)
+	fmt.Println(art, err)
+	// t.Fail()
 }

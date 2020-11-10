@@ -52,6 +52,12 @@ jobs:
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v1
+    
+    - name: upload test artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: test
+        path: github/resources/*
 
     - name: Get dependencies
       run: go mod download

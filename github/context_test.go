@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -70,7 +71,32 @@ func deserializeAnonymous(r io.Reader) interface{} {
 	return filterEmpty(d)
 }
 
+func allGitHubEnv() map[string]string {
+	r := map[string]string{}
+	for _, e := range os.Environ() {
+		if strings.HasPrefix(e, "GITHUB_") {
+			l := strings.SplitN(e, "=", 2)
+			if len(l) == 2 {
+				r[l[0]] = l[1]
+			}
+		}
+	}
+	return r
+}
+
 func testEventParser(t *testing.T, path string) {
+	oldEnv := allGitHubEnv()
+	defer func() {
+		for k, v := range oldEnv {
+			os.Setenv(k, v)
+		}
+		for k := range allGitHubEnv() {
+			_, ok := oldEnv[k]
+			if !ok {
+				os.Unsetenv(k)
+			}
+		}
+	}()
 	t.Run(fmt.Sprintf("with event %s", path), func(t *testing.T) {
 		os.Setenv("GITHUB_ACTIONS", "true")
 		os.Setenv("GITHUB_HEAD_REF", "")
